@@ -22,10 +22,23 @@ int main(void)
 		}
 		if (nread > 0 && buffer[nread - 1] == '\n')
 			buffer[nread - 1] = '\0';
-		if (access(buffer, F_OK) == 0)
-			system(buffer);
+		char *token = strtok(buffer, " ");
+
+		if (access(token, F_OK) == 0)
+		{
+			char *args[10];
+			int i = 0;
+
+			while (token != NULL)
+			{
+				args[i++] = token;
+				token = strtok(NULL, " ");
+			}
+			args[i] = NULL;
+			execve(args[0], args, NULL);
+		}
 		else
-			printf("Command not found: %s\n", buffer);
+			printf("Command not found: %s\n", token);
 	}
 	return (0);
 }
