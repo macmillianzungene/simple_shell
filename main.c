@@ -1,11 +1,16 @@
 #include "main.h"
 
+/**
+ * main - Entry point
+ *
+ * Return: void
+ */
 int main(void)
 {
 	char *buffer = NULL;
 	size_t bufsize = 0;
 	ssize_t nread;
-	
+
 	while (1)
 	{
 		printf("$ ");
