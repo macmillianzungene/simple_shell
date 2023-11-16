@@ -7,42 +7,28 @@
  */
 int main(void)
 {
-	char cmd[MAX_CMD_LEN];
-	char *argv[MAX_ARGS];
-	char *path = "/bin/";
-	char progpath[20];
-	int argc;
+	char *buffer = NULL;
+	size_t bufsize = 0;
+	ssize_t nread;
+	char *args[2];
 
 	while (1)
 	{
 		printf("Macmillian$ ");
-		fgets(cmd, sizeof(cmd), stdin);
+		nread = getline(&buffer, &bufsize, stdin);
 
-		/* Remove trailing newline character */
-		if (cmd[strlen(cmd) - 1] == '\n')
+		if (nread == -1)
 		{
-			cmd[strlen(cmd) - 1] = '\0';
+			free(buffer);
+			exit(EXIT_SUCCESS);
 		}
+		buffer[strcspn(buffer, "\n")] = 0;
+		args[0] = buffer;
+		args[1] = NULL;
 
-		/* Handle EOF */
-		if (feof(stdin))
+		if (execve(args[0], args, NULL) == -1)
 		{
-			printf("\n");
-			exit(0);
-		}
-
-		/* Prepare arguments for execve */
-		argv[0] = cmd;
-		argv[1] = NULL;
-
-		/* Create program path */
-		strcpy(progpath, path);
-		strcat(progpath, cmd);
-
-		/* Execute the command */
-		if (execve(progpath, argv, NULL) == -1)
-		{
-			perror("Error");
+			printf("Error: command not found\n");
 		}
 	}
 	return (0);
