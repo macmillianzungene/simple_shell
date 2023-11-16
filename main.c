@@ -26,16 +26,9 @@ int main(void)
 
 		if (access(token, F_OK) == 0)
 		{
-			char *args[10];
-			int i = 0;
+			char *args[] = {token, NULL};
 
-			while (token != NULL)
-			{
-				args[i++] = token;
-				token = strtok(NULL, " ");
-			}
-			args[i] = NULL;
-			execve(args[0], args, NULL);
+			execve(token, args, NULL);
 		}
 		else
 			printf("Command not found: %s\n", token);
