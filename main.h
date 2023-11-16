@@ -6,4 +6,7 @@
 #include <unistd.h>
 #include <string.h>
 
+#define MAX_CMD_LEN 100
+#define MAX_ARGS 10
+
 #endif

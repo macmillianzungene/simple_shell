@@ -7,31 +7,43 @@
  */
 int main(void)
 {
-	char *buffer = NULL;
-	size_t bufsize = 0;
-	ssize_t nread;
+	char cmd[MAX_CMD_LEN];
+	char *argv[MAX_ARGS];
+	char *path = "/bin/";
+	char progpath[20];
+	int argc;
 
 	while (1)
 	{
 		printf("Macmillian$ ");
-		nread = getline(&buffer, &bufsize, stdin);
-		if (nread == -1)
-		{
-			free(buffer);
-			exit(EXIT_SUCCESS);
-		}
-		if (nread > 0 && buffer[nread - 1] == '\n')
-			buffer[nread - 1] = '\0';
-		char *token = strtok(buffer, " ");
+		fgets(cmd, sizeof(cmd), stdin);
 
-		if (access(token, F_OK) == 0)
+		/* Remove trailing newline character */
+		if (cmd[strlen(cmd) - 1] == '\n')
 		{
-			char *args[] = {token, NULL};
-
-			execve(token, args, NULL);
+			cmd[strlen(cmd) - 1] = '\0';
 		}
-		else
-			printf("Command not found: %s\n", token);
+
+		/* Handle EOF */
+		if (feof(stdin))
+		{
+			printf("\n");
+			exit(0);
+		}
+
+		/* Prepare arguments for execve */
+		argv[0] = cmd;
+		argv[1] = NULL;
+
+		/* Create program path */
+		strcpy(progpath, path);
+		strcat(progpath, cmd);
+
+		/* Execute the command */
+		if (execve(progpath, argv, NULL) == -1)
+		{
+			perror("Error");
+		}
 	}
 	return (0);
 }
