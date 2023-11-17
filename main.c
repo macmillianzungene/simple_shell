@@ -1,84 +1,36 @@
 #include "main.h"
 
 /**
- * read_input -  Function to read a line of input
- *
- * Return: line
- */
-
-char *read_input()
-{
-	char *line = NULL;
-	size_t bufsize = 0;
-
-	getline(&line, &bufsize, stdin);
-
-	return (line);
-}
-
-/**
- * execute_command - Function to execute a command
- *
- * @command: input char
- * Return: void
- */
-void execute_command(char *command)
-{
-	pid_t pid;
-	int status;
-
-	pid = fork();
-	if (pid == 0)
-	{
-		/* Child process */
-		char *args[] = {command, NULL};
-
-		execve(command, args, NULL);
-		perror("Error executing command");
-		exit(EXIT_FAILURE);
-	}
-	else if
-		(pid > 0)
-		{
-			/* Parent process */
-			wait(&status);
-		}
-	else
-	{
-		perror("Error forking process");
-	}
-}
-
-/**
  * main - Entry point
  *
  * Return: Always 0 (Success)
  */
+
 int main(void)
 {
-	char *input;
-	char *command;
+	char *buffer = NULL;
+	size_t bufsize = 0;
+	ssize_t nread;
+	char *args[2];
 
 	while (1)
 	{
-		printf("Mac_Millian$ "); /* Display prompt */
-		input = read_input();    /* Read user input */
+		printf("Macmillian$ ");
+		nread = getline(&buffer, &bufsize, stdin);
 
-		/* Remove newline character */
-		input[strcspn(input, "\n")] = '\0';
-		/* Execute the command */
-		command = strtok(input, " ");
-
-		if (command != NULL)
+		if (nread == -1)
 		{
-			execute_command(command);
+			free(buffer);
+			exit(EXIT_SUCCESS);
 		}
-		else
-		{
-			printf("Invalid command. Please try again.\n");
-		}
+		buffer[strcspn(buffer, "\n")] = 0;
+		args[0] = buffer;
+		args[1] = NULL;
 
-		free(input);
+		if (execve(args[0], args, NULL) == -1)
+		{
+			printf("Error: command not found\n");
+		}
 	}
 	return (0);
 }
